@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
-import { AppLayout } from '@/components/layout/app-layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,9 +19,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="es" className="h-full">
         <body className={`${inter.className} h-full`}>
-          <AppLayout>
-            {children}
-          </AppLayout>
+          {children}
         </body>
       </html>
     </ClerkProvider>

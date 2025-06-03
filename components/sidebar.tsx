@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useSidebar } from './layout/sidebar-context'
 
-const navigation = [
+const mainNavigation = [
   { name: 'Dashboard', href: '/', icon: BarChart },
   { name: 'Flota', href: '/flota', icon: Truck },
   { name: 'Choferes', href: '/choferes', icon: Users },
@@ -31,6 +31,10 @@ const navigation = [
   { name: 'Mantenimiento', href: '/mantenimiento', icon: Wrench },
   { name: 'Documentos', href: '/documentos', icon: FileText },
   { name: 'Configuración', href: '/configuracion', icon: Settings },
+]
+
+const adminNavigation = [
+  { name: 'Usuarios', href: '/usuarios', icon: Users },
 ]
 
 export function Sidebar() {
@@ -85,7 +89,36 @@ export function Sidebar() {
         </div>
         <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
           <div className="space-y-1">
-            {navigation.map((item) => {
+            {/* Navegación principal */}
+            {mainNavigation.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMobileOpen(false)}
+                  className={cn(
+                    'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                    isActive
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                  )}
+                >
+                  <item.icon className={cn(
+                    'h-5 w-5',
+                    isCollapsed ? '' : 'mr-3',
+                    isActive ? 'text-blue-700' : 'text-gray-400'
+                  )} />
+                  {!isCollapsed && <span>{item.name}</span>}
+                </Link>
+              )
+            })}
+
+            {/* Separador */}
+            <div className="my-4 border-t border-gray-200" />
+
+            {/* Navegación de administración */}
+            {adminNavigation.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link

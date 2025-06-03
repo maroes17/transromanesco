@@ -1,13 +1,15 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { ClerkProvider } from '@clerk/nextjs'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
+import { ThemeProvider } from '@/components/theme-provider'
+import { SidebarProvider } from '@/contexts/sidebar-context'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TransRomanesco - Sistema de Gestión de Transporte',
-  description: 'Sistema integral de gestión de transporte y logística',
+  title: 'TransRomanesco',
+  description: 'Sistema de gestión de transporte',
 }
 
 export default function RootLayout({
@@ -17,9 +19,18 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="es" className="h-full">
-        <body className={`${inter.className} h-full`}>
-          {children}
+      <html lang="es" suppressHydrationWarning>
+        <body className={inter.className}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              {children}
+            </SidebarProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

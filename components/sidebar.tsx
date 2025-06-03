@@ -1,149 +1,168 @@
 'use client'
 
-import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
-import {
-  Truck,
-  Users,
-  Map,
-  FileText,
-  DollarSign,
-  Wrench,
-  Settings,
-  BarChart,
-  Shield,
-  Menu,
-  X,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useSidebar } from './layout/sidebar-context'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useSidebar } from '@/contexts/sidebar-context'
+import { 
+  LayoutDashboard, 
+  Users, 
+  Settings, 
+  Truck, 
+  MapPin, 
+  Bell, 
+  ChevronRight, 
+  ChevronLeft,
+  Menu,
+  X
+} from 'lucide-react'
 
-const mainNavigation = [
-  { name: 'Dashboard', href: '/', icon: BarChart },
-  { name: 'Flota', href: '/flota', icon: Truck },
-  { name: 'Choferes', href: '/choferes', icon: Users },
-  { name: 'Viajes', href: '/viajes', icon: Map },
-  { name: 'Pólizas', href: '/polizas', icon: Shield },
-  { name: 'Gastos', href: '/gastos', icon: DollarSign },
-  { name: 'Mantenimiento', href: '/mantenimiento', icon: Wrench },
-  { name: 'Documentos', href: '/documentos', icon: FileText },
-  { name: 'Configuración', href: '/configuracion', icon: Settings },
+const mainRoutes = [
+  {
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/dashboard',
+    color: 'text-sky-500'
+  },
+  {
+    label: 'Vehículos',
+    icon: Truck,
+    href: '/vehiculos',
+    color: 'text-orange-700'
+  },
+  {
+    label: 'Geocercas',
+    icon: MapPin,
+    href: '/geocercas',
+    color: 'text-emerald-500'
+  },
+  {
+    label: 'Notificaciones',
+    icon: Bell,
+    href: '/notificaciones',
+    color: 'text-yellow-500'
+  }
 ]
 
-const adminNavigation = [
-  { name: 'Usuarios', href: '/usuarios', icon: Users },
+const bottomRoutes = [
+  {
+    label: 'Usuarios',
+    icon: Users,
+    href: '/usuarios',
+    color: 'text-violet-500'
+  },
+  {
+    label: 'Configuración',
+    icon: Settings,
+    href: '/configuracion',
+    color: 'text-pink-700'
+  }
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar()
+  const { isCollapsed, setIsCollapsed } = useSidebar()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const toggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      setIsMobileMenuOpen(!isMobileMenuOpen)
+    } else {
+      setIsCollapsed(!isCollapsed)
+    }
+  }
 
   return (
     <>
-      {/* Botón para mostrar/ocultar sidebar en móviles */}
+      {/* Mobile Menu Button */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="md:hidden fixed top-4 left-4 z-50"
+        onClick={toggleSidebar}
       >
-        {isMobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>
-
-      {/* Overlay para móviles */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 md:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
 
       {/* Sidebar */}
       <aside
         className={cn(
-          'absolute left-0 top-0 h-full transform bg-white transition-all duration-300 ease-in-out',
-          'border-r border-gray-200',
-          isCollapsed ? 'w-16' : 'w-64',
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          "fixed inset-y-0 left-0 z-40 flex flex-col bg-background border-r transition-all duration-300 ease-in-out",
+          isCollapsed ? "w-16" : "w-64",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
+        <div className="flex h-16 items-center justify-between px-4 border-b">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-gray-900">TransRomanesco</h2>
+            <h2 className="text-lg font-semibold">TransRomanesco</h2>
           )}
           <Button
             variant="ghost"
             size="icon"
             className="hidden md:flex"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleSidebar}
           >
             {isCollapsed ? (
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-6 w-6" />
             ) : (
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-6 w-6" />
             )}
           </Button>
         </div>
-        <nav className="h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
-          <div className="space-y-1">
-            {/* Navegación principal */}
-            {mainNavigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
+
+        <div className="flex flex-col flex-1">
+          <ScrollArea className="flex-1 py-4">
+            <div className="space-y-1 px-2">
+              {mainRoutes.map((route) => (
                 <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsMobileOpen(false)}
+                  key={route.href}
+                  href={route.href}
                   className={cn(
-                    'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                    isActive
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                    "flex items-center gap-x-2 text-sm font-medium p-2 rounded-lg transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    pathname === route.href ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                    isCollapsed && "justify-center"
                   )}
                 >
-                  <item.icon className={cn(
-                    'h-5 w-5',
-                    isCollapsed ? '' : 'mr-3',
-                    isActive ? 'text-blue-700' : 'text-gray-400'
-                  )} />
-                  {!isCollapsed && <span>{item.name}</span>}
+                  <route.icon className={cn("h-5 w-5", route.color)} />
+                  {!isCollapsed && <span>{route.label}</span>}
                 </Link>
-              )
-            })}
+              ))}
+            </div>
+          </ScrollArea>
 
-            {/* Separador */}
-            <div className="my-4 border-t border-gray-200" />
-
-            {/* Navegación de administración */}
-            {adminNavigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
+          <div className="mt-auto border-t py-4">
+            <div className="space-y-1 px-2">
+              {bottomRoutes.map((route) => (
                 <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsMobileOpen(false)}
+                  key={route.href}
+                  href={route.href}
                   className={cn(
-                    'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                    isActive
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                    "flex items-center gap-x-2 text-sm font-medium p-2 rounded-lg transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    pathname === route.href ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                    isCollapsed && "justify-center"
                   )}
                 >
-                  <item.icon className={cn(
-                    'h-5 w-5',
-                    isCollapsed ? '' : 'mr-3',
-                    isActive ? 'text-blue-700' : 'text-gray-400'
-                  )} />
-                  {!isCollapsed && <span>{item.name}</span>}
+                  <route.icon className={cn("h-5 w-5", route.color)} />
+                  {!isCollapsed && <span>{route.label}</span>}
                 </Link>
-              )
-            })}
+              ))}
+            </div>
           </div>
-        </nav>
+        </div>
       </aside>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </>
   )
 } 
